@@ -81,7 +81,7 @@ public class Main {
 						
 						break;
 					case 4: 
-						System.out.println("Test");
+						System.out.println("Test1");
 						break;
 					case 5: 
 						break;
