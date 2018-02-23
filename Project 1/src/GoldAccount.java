@@ -22,7 +22,10 @@ public class GoldAccount extends Account {
 		setBalance(getBalance() * 1.05);
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "GoldAccount [balance=" + balance + ", customerInfo=" + customerInfo + "]";
+	}
 	
 
 

@@ -2,11 +2,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
+	static Scanner input = new Scanner(System.in);
 	static ArrayList<Account> accounts = new ArrayList<Account>();
 	public static void main(String[] args){
 
-	Scanner input = new Scanner(System.in);
+	
 
 			boolean finished = false;
 
@@ -81,7 +81,7 @@ public class Main {
 						
 						break;
 					case 4: 
-						System.out.println("Test");
+						System.out.println("Hello");
 						break;
 					case 5: 
 						break;
@@ -120,10 +120,16 @@ public class Main {
 		System.out.println("");
 		System.out.println("     Menu");
 		System.out.println(" =====================");
-		System.out.println(" 1.  Menu Item");
-		System.out.println(" 2.  Menu Item");
-		System.out.println(" 3.  Menu Item");
-		System.out.println(" 4.  Exit");
+		System.out.println(" 1.  Create Checking Account");
+		System.out.println(" 2.  Create Gold Account");
+		System.out.println(" 3.  Create Regular Account");
+		System.out.println(" 4.  Deposit");
+		System.out.println(" 5.  Withdraw");
+		System.out.println(" 6.  Display Account Info.");
+		System.out.println(" 7.  Remove an Account");
+		System.out.println(" 8.  Apply end of month");
+		System.out.println(" 9.  Display Bank Statistics");
+		System.out.println(" 10. Exit");
 		System.out.println("");
 
 		// Get the input from the user
@@ -138,31 +144,21 @@ public class Main {
 	public static void addAccount(Account Account) {
 		accounts.add(Account);
 	}
+	
 	public static void accountInfo() {
-		double checking = 0;
-		double gold = 0;
-		double regular = 0;
-		String name;
+		System.out.println("Please input account number ");
+		String accountNumber = input.next();
 		for (Account e : accounts) {
-			if (e instanceof CheckingAccount) {
-
-				checking += e.getBalance();
-				
+			if (accountNumber.equals(e.getNumber())) {
+				System.out.print(e);
 			}
-			if (e instanceof GoldAccount) {
-
-				gold += e.getBalance();
-
-			}
-			if (e instanceof RegularAccount) {
-				
-				regular += e.getBalance();
-			}
-
 		}
-		System.out.println(checking);
-		System.out.println(gold);
-		System.out.println(regular);
 	}
-
+ public static void accountTest(){
+	for (Account e : accounts) {
+		if (e instanceof Account) {
+		System.out.print(e);
+		}
+	}
+}
 }

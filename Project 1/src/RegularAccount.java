@@ -23,5 +23,8 @@ public class RegularAccount extends Account {
 	public void fixedCharge() {
 		setBalance(getBalance() - 10);
 	}
-
+	@Override
+	public String toString() {
+		return "RegularAccount [balance=" + balance + ", customerInfo=" + customerInfo + "]";
+	}
 }

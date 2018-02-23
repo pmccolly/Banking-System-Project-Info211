@@ -38,13 +38,15 @@ public abstract class Account {
 		this.customerInfo = customerInfo;
 	}
 
-	public abstract void accountWithdraw(Double withdrawNum);
-
-	{
+	public abstract void accountWithdraw(Double withdrawNum);{
 	}
 
-	public abstract void accountDeposit(Double depositNum);
-
-	{
+	public abstract void accountDeposit(Double depositNum);{
 	}
+
+	@Override
+	public String toString() {
+		return "Account [number=" + number + ", balance=" + balance + ", customerInfo=" + customerInfo + "]";
+	}
+	
 }
