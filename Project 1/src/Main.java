@@ -154,11 +154,7 @@ public class Main {
 			}
 		}
 	}
- public static void accountTest(){
-	for (Account e : accounts) {
-		if (e instanceof Account) {
-		System.out.print(e);
-		}
-	}
-}
+ public static void deposit() {
+	 
+ }
 }
