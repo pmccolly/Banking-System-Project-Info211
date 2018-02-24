@@ -9,16 +9,16 @@ public class CheckingAccount extends Account {
 	// Withdraw and Deposit for Checking account have first 2 exchanges free then
 	// charge $3
 	public void accountWithdraw(Double withdrawNum) {
-		chargeCounter();
+		
 		setBalance(getBalance() - withdrawNum);
-		if (chargeCounter() > 2)
+		if (chargeCounter() >= 2)
 			setBalance(getBalance() - 3);
 	}
 
 	public void accountDeposit(Double depositNum) {
-		chargeCounter();
+		
 		setBalance(getBalance() + depositNum);
-		if (chargeCounter() > 2)
+		if (chargeCounter() >= 2)
 			setBalance(getBalance() - 3);
 	}
 
