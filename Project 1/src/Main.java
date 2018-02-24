@@ -41,7 +41,7 @@ public class Main {
 
 				break;
 			case 4:
-				System.out.println("Hello");
+				deposit();
 				break;
 			case 5:
 				break;
@@ -160,7 +160,6 @@ public class Main {
 	// Removes an account from the array list
 	public static void removeAccount(Account Account) {
 
-
 		System.out.println("Please input the account number: ");
 		String accountNumber = input.next();
 		for (Account e : accounts) {
@@ -182,6 +181,20 @@ public class Main {
 	}
 
 	public static void deposit() {
-
+		System.out.println("Please input account number ");
+		String accountNumber = input.next();
+		System.out.println("Please input the amount you'd like to deposit: ");
+		double depositNum = input.nextDouble();
+		
+		for (Account e : accounts) {
+			if (accountNumber.equals(e.getNumber())) {
+				if ( e instanceof CheckingAccount) {
+					CheckingAccount se = (CheckingAccount) e;
+					se.chargeCounter();
+					se.accountDeposit(depositNum);
+					
+				}
+			}
+		}
 	}
-}
+} 
