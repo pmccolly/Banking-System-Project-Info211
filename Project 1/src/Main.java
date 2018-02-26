@@ -10,7 +10,8 @@ public class Main {
 		boolean finished = false;
 
 		while (finished == false) {
-			// Menu Display and Get user input
+			// Menu Display and Get user input jhgjhg
+			//new comment
 			int inputInt = 0;
 			while (inputInt == 0) {
 				inputInt = displayMenuAndGetInput();
