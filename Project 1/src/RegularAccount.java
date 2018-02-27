@@ -7,7 +7,10 @@ public class RegularAccount extends Account {
 	}
 
 	public void accountWithdraw(Double withdrawNum) {
+		if (withdrawNum<=getBalance())
 		setBalance(getBalance() - withdrawNum);
+		else
+			setBalance(getBalance()-getBalance());
 
 	}
 

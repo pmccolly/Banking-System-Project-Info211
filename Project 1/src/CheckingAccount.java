@@ -10,16 +10,18 @@ public class CheckingAccount extends Account {
 	// charge $3
 	public void accountWithdraw(Double withdrawNum) {
 		
-		setBalance(getBalance() - withdrawNum);
-		if (chargeCounter() >= 2)
-			setBalance(getBalance() - 3);
+		if (withdrawNum<=getBalance())
+			setBalance(getBalance() - withdrawNum);
+			else
+				setBalance(getBalance()-getBalance());
+		chargeCounter();
 	}
 
 	public void accountDeposit(Double depositNum) {
 		
 		setBalance(getBalance() + depositNum);
-		if (chargeCounter() >= 2)
-			setBalance(getBalance() - 3);
+		chargeCounter();
+			
 	}
 
 	public int chargeCounter() {
