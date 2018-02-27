@@ -274,9 +274,9 @@ public class Main {
 			sumOfAccounts += e.getBalance();
 			if (0 == e.getBalance())
 				numOfZeroBalance++;
-			if (e.getBalance() > largestAmount) {
+			if (e.getBalance() >= largestAmount) {
 				largestAmount = e.getBalance();
-				largestAccount = e.getNumber();
+				largestAccount = e.getCustomerInfo().getCustomerName();
 			}
 
 		}
@@ -284,7 +284,7 @@ public class Main {
 		System.out.println("The sum of all accounts is $" + sumOfAccounts);
 		System.out.println("The number of zero balance accounts is " + numOfZeroBalance);
 		System.out.println("The average balance of all accounts is $" + averageBalance);
-		System.out.println("The largest account is account ID " + largestAccount);
+		System.out.println("The largest account is " + largestAccount);
 
 	}
 
