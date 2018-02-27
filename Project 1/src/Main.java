@@ -41,11 +41,11 @@ public class Main {
 
 				break;
 			case 4:
-				//Deposits money into selected account
+				// Deposits money into selected account
 				deposit();
 				break;
 			case 5:
-				//Withdraws money from the selected account
+				// Withdraws money from the selected account
 				withdraw();
 				break;
 			case 6:
@@ -57,8 +57,10 @@ public class Main {
 				removeAccount(null);
 				break;
 			case 8:
+				endOfMonth();
 				break;
 			case 9:
+				
 				break;
 
 			case 10:
@@ -80,7 +82,7 @@ public class Main {
 
 		// Menu Display
 		System.out.println("");
-		System.out.println("     Menu");
+		System.out.println("    Bank Menu");
 		System.out.println(" =====================");
 		System.out.println(" 1.  Create Checking Account");
 		System.out.println(" 2.  Create Gold Account");
@@ -114,7 +116,7 @@ public class Main {
 		String customerID = input.next();
 		cust1.setCustomerID(customerID);
 		// Creates a new account
-		CheckingAccount ac1 = new CheckingAccount(null, 0, cust1);
+		Account ac1 = new CheckingAccount(null, 0, cust1);
 		System.out.println("Please input the account number :");
 		String number = input.next();
 		ac1.setNumber(number);
@@ -131,7 +133,7 @@ public class Main {
 		String customerID2 = input.next();
 		cust2.setCustomerID(customerID2);
 		// Creates a new account
-		GoldAccount ac2 = new GoldAccount(null, 0, cust2);
+		Account ac2 = new GoldAccount(null, 0, cust2);
 		System.out.println("Please input the account number :");
 		String number2 = input.next();
 		ac2.setNumber(number2);
@@ -148,11 +150,10 @@ public class Main {
 		String customerID3 = input.next();
 		cust3.setCustomerID(customerID3);
 		// Creates a new account
-		RegularAccount ac3 = new RegularAccount(null, 0, cust3);
+		Account ac3 = new RegularAccount(null, 0, cust3);
 		System.out.println("Please input the account number :");
 		String number3 = input.next();
 		ac3.setNumber(number3);
-		ac3.fixedCharge();
 		addAccount(ac3);
 	}
 
@@ -209,6 +210,7 @@ public class Main {
 			}
 		}
 	}
+
 	public static void withdraw() {
 		System.out.println("Please input account number ");
 		String accountNumber = input.next();
@@ -219,7 +221,8 @@ public class Main {
 			if (accountNumber.equals(e.getNumber())) {
 				if (e instanceof CheckingAccount) {
 					CheckingAccount ce = (CheckingAccount) e;
-					ce.accountWithdraw(withdrawNum);;
+					ce.accountWithdraw(withdrawNum);
+					;
 
 				}
 				if (e instanceof GoldAccount) {
@@ -234,4 +237,25 @@ public class Main {
 			}
 		}
 	}
+
+	public static void endOfMonth() {
+		for (Account e : accounts) {
+			if (e instanceof CheckingAccount) {
+				CheckingAccount ce = (CheckingAccount) e;
+			ce.setBalance((ce.getBalance() - ((ce.chargeCounter() - 2) * 3)));
+
+			}
+			if (e instanceof GoldAccount) {
+				GoldAccount ge = (GoldAccount) e;
+				ge.setInterest();
+			}
+			if (e instanceof RegularAccount) {
+				RegularAccount re = (RegularAccount) e;
+				re.setInterest();
+
+			}
+		}
+	}
+
 }
+
