@@ -10,8 +10,7 @@ public class Main {
 		boolean finished = false;
 
 		while (finished == false) {
-			// Menu Display and Get user input jhgjhg
-			//new comment
+			// Menu Display and Get user input
 			int inputInt = 0;
 			while (inputInt == 0) {
 				inputInt = displayMenuAndGetInput();
@@ -61,7 +60,7 @@ public class Main {
 				endOfMonth();
 				break;
 			case 9:
-				
+				displayStatistics();
 				break;
 
 			case 10:
@@ -223,7 +222,6 @@ public class Main {
 				if (e instanceof CheckingAccount) {
 					CheckingAccount ce = (CheckingAccount) e;
 					ce.accountWithdraw(withdrawNum);
-					;
 
 				}
 				if (e instanceof GoldAccount) {
@@ -239,11 +237,13 @@ public class Main {
 		}
 	}
 
+	// Method to apply end of month updates to user accounts
 	public static void endOfMonth() {
 		for (Account e : accounts) {
 			if (e instanceof CheckingAccount) {
 				CheckingAccount ce = (CheckingAccount) e;
-			ce.setBalance((ce.getBalance() - ((ce.chargeCounter() - 2) * 3)));
+				if (ce.chargeCounter() > 2)
+					ce.setBalance((ce.getBalance() - ((ce.chargeCounter() - 2) * 3)));
 
 			}
 			if (e instanceof GoldAccount) {
@@ -253,10 +253,39 @@ public class Main {
 			if (e instanceof RegularAccount) {
 				RegularAccount re = (RegularAccount) e;
 				re.setInterest();
+				re.fixedCharge();
 
 			}
 		}
 	}
 
-}
+	// Method to display Statistics of bank, total sum of all accounts in the
+	// bank, number of zero-balance accounts, average balance of accounts, the
+	// account with largest balance
+	public static void displayStatistics() {
+		double sumOfAccounts = 0;
+		int numOfZeroBalance = 0;
+		double averageBalance = 0;
+		String largestAccount = "";
+		double largestAmount = 0;
+		int counter = 0;
+		for (Account e : accounts) {
+			counter++;
+			sumOfAccounts += e.getBalance();
+			if (0 == e.getBalance())
+				numOfZeroBalance++;
+			if (e.getBalance() > largestAmount) {
+				largestAmount = e.getBalance();
+				largestAccount = e.getNumber();
+			}
 
+		}
+		averageBalance = sumOfAccounts / counter;
+		System.out.println("The sum of all accounts is $" + sumOfAccounts);
+		System.out.println("The number of zero balance accounts is " + numOfZeroBalance);
+		System.out.println("The average balance of all accounts is $" + averageBalance);
+		System.out.println("The largest account is account ID " + largestAccount);
+
+	}
+
+}
