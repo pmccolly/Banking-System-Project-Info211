@@ -54,7 +54,7 @@ public class Main {
 				break;
 			case 7:
 				// Removes an account from the array
-				removeAccount(null);
+				removeAccount();
 				break;
 			case 8:
 				endOfMonth();
@@ -163,7 +163,7 @@ public class Main {
 	}
 
 	// Removes an account from the array list
-	public static void removeAccount(Account Account) {
+	public static void removeAccount() {
 
 		System.out.println("Please input the account number: ");
 		String accountNumber = input.next();
