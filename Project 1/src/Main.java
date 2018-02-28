@@ -167,9 +167,9 @@ public class Main {
 
 		System.out.println("Please input the account number: ");
 		String accountNumber = input.next();
-		for (Account e : accounts) {
-			if (accountNumber.equals(e.getNumber())) {
-				accounts.remove(e);
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accountNumber.equals(accounts.get(i).getNumber())) {
+				accounts.remove(i);
 			}
 		}
 	}
