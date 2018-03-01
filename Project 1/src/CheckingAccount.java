@@ -1,5 +1,6 @@
 
 public class CheckingAccount extends Account {
+	int chargeNumber = 0;
 
 	public CheckingAccount(String number, double balance, Customer customerInfo) {
 		super(number, balance, customerInfo);
@@ -24,10 +25,9 @@ public class CheckingAccount extends Account {
 			
 	}
 
-	public int chargeCounter() {
-		int counter = 0;
-		counter++;
-		return counter;
+	public void chargeCounter() {
+		chargeNumber++;
+		
 
 	}
 

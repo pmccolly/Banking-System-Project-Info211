@@ -176,7 +176,7 @@ public class Main {
 
 	// Displays the accounts user information
 	public static void accountInfo() {
-		System.out.println("Please input account number ");
+		System.out.println("Please input account number: ");
 		String accountNumber = input.next();
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
@@ -196,7 +196,7 @@ public class Main {
 				if (e instanceof CheckingAccount) {
 					CheckingAccount ce = (CheckingAccount) e;
 					ce.accountDeposit(depositNum);
-
+					
 				}
 				if (e instanceof GoldAccount) {
 					GoldAccount ge = (GoldAccount) e;
@@ -212,7 +212,7 @@ public class Main {
 	}
 
 	public static void withdraw() {
-		System.out.println("Please input account number ");
+		System.out.println("Please input account number: ");
 		String accountNumber = input.next();
 		System.out.println("Please input the amount you'd like to withdraw: ");
 		double withdrawNum = input.nextDouble();
@@ -242,8 +242,8 @@ public class Main {
 		for (Account e : accounts) {
 			if (e instanceof CheckingAccount) {
 				CheckingAccount ce = (CheckingAccount) e;
-				if (ce.chargeCounter() > 2)
-					ce.setBalance((ce.getBalance() - ((ce.chargeCounter() - 2) * 3)));
+				if (ce.chargeNumber > 2)
+					ce.setBalance((ce.getBalance() - ((ce.chargeNumber - 2) * 3)));
 
 			}
 			if (e instanceof GoldAccount) {
@@ -288,5 +288,3 @@ public class Main {
 
 	}
 }
-
-
