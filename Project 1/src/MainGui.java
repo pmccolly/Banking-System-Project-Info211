@@ -7,18 +7,22 @@ import javax.swing.JOptionPane;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -27,6 +31,9 @@ public class MainGui extends Application {
 	static Scanner input = new Scanner(System.in);
 	static ArrayList<Account> accounts = new ArrayList<Account>();
 	private Stage stage;
+	TextArea outputArea = new TextArea();
+	String outputAreaText = "";
+	int accountSwitch = 0;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -82,7 +89,7 @@ public class MainGui extends Application {
 
 		operatorTools.getItems().addAll(depositTool, withdrawTool, infoTool, removeTool);
 
-		TextArea outputArea = new TextArea();
+		
 		outputArea.setPrefRowCount(4);
 		outputArea.setPrefColumnCount(8);
 		outputArea.setEditable(false);
@@ -95,6 +102,17 @@ public class MainGui extends Application {
 
 		createChecking.setOnAction(actionEvent -> {
 			setScene(stage);
+			accountSwitch = 1;
+		});
+
+		createGold.setOnAction(actionEvent -> {
+			setScene(stage);
+			accountSwitch = 2;
+		});
+
+		createRegular.setOnAction(actionEvent -> {
+			setScene(stage);
+			accountSwitch = 3;
 		});
 
 		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
@@ -104,59 +122,155 @@ public class MainGui extends Application {
 
 	protected BorderPane getAccountPane() {
 		BorderPane mainPane = new BorderPane();
+		MenuBar menuBar = new MenuBar();
+		menuBar.setPrefWidth(300);
+		mainPane.setTop(menuBar);
+
+		// File menu - new, save, exit
+		Menu fileMenu = new Menu("File");
+		MenuItem newMenuItem = new MenuItem("New");
+		MenuItem saveMenuItem = new MenuItem("Save");
+		MenuItem exitMenuItem = new MenuItem("Exit");
+		exitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN));
+
+		fileMenu.getItems().addAll(newMenuItem, saveMenuItem, new SeparatorMenuItem(), exitMenuItem);
+
+		// CheckMenuItem: A MenuItem that can be toggled between selected and unselected
+		// states.
+		Menu operatorMenu = new Menu("Create Accounts");
+		MenuItem createChecking = new MenuItem("Checking");
+		MenuItem createGold = new MenuItem("Gold");
+		MenuItem createRegular = new MenuItem("Regular");
+
+		operatorMenu.getItems().addAll(createChecking, createGold, createRegular);
+
+		Menu operatorTools = new Menu("Tools");
+		MenuItem depositTool = new MenuItem("Deposit");
+		MenuItem withdrawTool = new MenuItem("Withdraw");
+		MenuItem infoTool = new MenuItem("Information");
+		MenuItem removeTool = new MenuItem("Remove Account");
+
+		operatorTools.getItems().addAll(depositTool, withdrawTool, infoTool, removeTool);
+
+		GridPane accountLayout = new GridPane();
+		mainPane.setCenter(accountLayout);
+		accountLayout.setVgap(5.5);
+		accountLayout.setHgap(5.5);
+
+		TextField firstName = new TextField();
+		accountLayout.add(new Label("First Name "), 1, 1);
+		accountLayout.add(firstName, 2, 1);
+
+		TextField lastName = new TextField();
+		accountLayout.add(new Label("Last Name "), 1, 2);
+		accountLayout.add(lastName, 2, 2);
+
+		TextField accountId = new TextField();
+		accountLayout.add(new Label("Account ID"), 1, 3);
+		accountLayout.add(accountId, 2, 3);
+
+		TextField accountNumber = new TextField();
+		accountLayout.add(new Label("Account Number"), 1, 4);
+		accountLayout.add(accountNumber, 2, 4);
+
+		Button createAccountBtn = new Button("Create Account");
+		accountLayout.add(createAccountBtn, 2, 5);
+
+		// Handling Events:
+		exitMenuItem.setOnAction(actionEvent -> {
+			Platform.exit();
+		});
+
+		createChecking.setOnAction(actionEvent -> {
+			setScene(stage);
+			accountSwitch = 1;
+		});
+
+		createAccountBtn.setOnAction(actionEvent -> {
+			if (accountSwitch == 1) {
+				
+			
+			createCheckingAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
+					accountNumber.getText());
+
+			start(stage);
+			outputArea.setText(outputAreaText += "Checking Account was created \n");
+			}
+			if (accountSwitch == 2) {
+
+				createGoldAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
+						accountNumber.getText());
+
+				start(stage);
+				outputArea.setText(outputAreaText += "Gold Account was created \n");
+			}
+			if (accountSwitch == 3) {
+
+				createRegularAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
+						accountNumber.getText());
+
+				start(stage);
+				outputArea.setText(outputAreaText += "Regular Account was created \n");
+			}
+			
+			
+		});
+
+		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
 
 		return mainPane;
+
 	}
 
 	// A method that creates a new checking a customer through user inputs
-	public static void createCheckingAccount() {
+	public static void createCheckingAccount(String name, String accId, String accNumber) {
 		Customer cust1 = new Customer(null, null);
-		System.out.println("Please input the customer name: ");
-		String customerInfo = input.next();
+
+		String customerInfo = name;
 		cust1.setCustomerName(customerInfo);
-		System.out.println("Please input the customer ID: ");
-		String customerID = input.next();
+
+		String customerID = accId;
 		cust1.setCustomerID(customerID);
 		// Creates a new account
 		Account ac1 = new CheckingAccount(null, 0, cust1);
-		System.out.println("Please input the account number :");
-		String number = input.next();
+
+		String number = accNumber;
 		ac1.setNumber(number);
 		addAccount(ac1);
 	}
 
 	// A method that creates a Gold Account through user inputs
-	public static void createGoldAccount() {
-		Customer cust2 = new Customer(null, null);
-		System.out.println("Please input the customer name: ");
-		String customerInfo2 = input.next();
-		cust2.setCustomerName(customerInfo2);
-		System.out.println("Please input the customer ID: ");
-		String customerID2 = input.next();
-		cust2.setCustomerID(customerID2);
+	public static void createGoldAccount(String name, String accId, String accNumber) {
+		Customer cust1 = new Customer(null, null);
+
+		String customerInfo = name;
+		cust1.setCustomerName(customerInfo);
+
+		String customerID = accId;
+		cust1.setCustomerID(customerID);
 		// Creates a new account
-		Account ac2 = new GoldAccount(null, 0, cust2);
-		System.out.println("Please input the account number :");
-		String number2 = input.next();
-		ac2.setNumber(number2);
-		addAccount(ac2);
+		Account ac1 = new CheckingAccount(null, 0, cust1);
+
+		String number = accNumber;
+		ac1.setNumber(number);
+		addAccount(ac1);
 	}
 
 	// Creates a Regular Account through user inputs
-	public static void createRegularAccount() {
-		Customer cust3 = new Customer(null, null);
-		System.out.println("Please input the customer name: ");
-		String customerInfo3 = input.next();
-		cust3.setCustomerName(customerInfo3);
-		System.out.println("Please input the customer ID: ");
-		String customerID3 = input.next();
-		cust3.setCustomerID(customerID3);
+	public static void createRegularAccount(String name, String accId, String accNumber) {
+		Customer cust1 = new Customer(null, null);
+
+		String customerInfo = name;
+		cust1.setCustomerName(customerInfo);
+
+		String customerID = accId;
+		cust1.setCustomerID(customerID);
 		// Creates a new account
-		Account ac3 = new RegularAccount(null, 0, cust3);
-		System.out.println("Please input the account number :");
-		String number3 = input.next();
-		ac3.setNumber(number3);
-		addAccount(ac3);
+		Account ac1 = new CheckingAccount(null, 0, cust1);
+
+		String number = accNumber;
+		ac1.setNumber(number);
+		addAccount(ac1);
 	}
 
 	// Adds an account to the accounts array list
