@@ -50,7 +50,7 @@ public class MainGui extends Application {
 		this.stage = primaryStage;
 	}
 
-	public void setScene(Stage primaryStage) {
+	public void setScene() {
 		Scene scene = new Scene(getAccountPane(), 600, 500, Color.WHITE);
 
 		stage.setScene(scene);
@@ -101,17 +101,17 @@ public class MainGui extends Application {
 		});
 
 		createChecking.setOnAction(actionEvent -> {
-			setScene(stage);
+			setScene();
 			accountSwitch = 1;
 		});
 
 		createGold.setOnAction(actionEvent -> {
-			setScene(stage);
+			setScene();
 			accountSwitch = 2;
 		});
 
 		createRegular.setOnAction(actionEvent -> {
-			setScene(stage);
+			setScene();
 			accountSwitch = 3;
 		});
 
@@ -151,6 +151,10 @@ public class MainGui extends Application {
 		MenuItem removeTool = new MenuItem("Remove Account");
 
 		operatorTools.getItems().addAll(depositTool, withdrawTool, infoTool, removeTool);
+		// Handling Events:
+		exitMenuItem.setOnAction(actionEvent -> {
+			Platform.exit();
+		});
 
 		GridPane accountLayout = new GridPane();
 		mainPane.setCenter(accountLayout);
@@ -176,13 +180,9 @@ public class MainGui extends Application {
 		Button createAccountBtn = new Button("Create Account");
 		accountLayout.add(createAccountBtn, 2, 5);
 
-		// Handling Events:
-		exitMenuItem.setOnAction(actionEvent -> {
-			Platform.exit();
-		});
 
 		createChecking.setOnAction(actionEvent -> {
-			setScene(stage);
+			setScene();
 			accountSwitch = 1;
 		});
 
@@ -221,7 +221,9 @@ public class MainGui extends Application {
 		return mainPane;
 
 	}
-
+	
+	
+	
 	// A method that creates a new checking a customer through user inputs
 	public static void createCheckingAccount(String name, String accId, String accNumber) {
 		Customer cust1 = new Customer(null, null);
