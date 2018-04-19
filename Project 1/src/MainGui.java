@@ -18,6 +18,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -43,21 +44,32 @@ public class MainGui extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 
-		Scene scene = new Scene(getPane(), 600, 500, Color.WHITE);
-		primaryStage.setTitle("Conversion Formulas");
+		Scene scene = new Scene(getMainTextArea(), 400, 300, Color.WHITE);
+		primaryStage.setTitle("Bank of McColly and LaDue");
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		primaryStage.getIcons().add(new Image("file:src/icon.jpg"));
 		this.stage = primaryStage;
 	}
 
-	public void setScene() {
-		Scene scene = new Scene(getAccountPane(), 600, 500, Color.WHITE);
+	public void setScene(BorderPane pane) {
+		Scene scene = new Scene(pane, 400, 300, Color.WHITE);
 
 		stage.setScene(scene);
 		stage.show();
 	}
 
-	protected BorderPane getPane() {
+	protected BorderPane getMainTextArea() {
+		outputArea.setPrefRowCount(4);
+		outputArea.setPrefColumnCount(8);
+		outputArea.setEditable(false);
+
+		BorderPane mainPane = getDefaultPane();
+		mainPane.setCenter(outputArea);
+		return mainPane;
+	}
+
+	protected BorderPane getDefaultPane() {
 		BorderPane mainPane = new BorderPane();
 		MenuBar menuBar = new MenuBar();
 		menuBar.setPrefWidth(300);
@@ -82,37 +94,47 @@ public class MainGui extends Application {
 		operatorMenu.getItems().addAll(createChecking, createGold, createRegular);
 
 		Menu operatorTools = new Menu("Tools");
-		MenuItem depositTool = new MenuItem("Deposit");
-		MenuItem withdrawTool = new MenuItem("Withdraw");
+		MenuItem depositWithdrawTool = new MenuItem("Deposit/Withdraw");
 		MenuItem infoTool = new MenuItem("Information");
+		MenuItem endOfMonthTool = new MenuItem("Apply End of Month");
 		MenuItem removeTool = new MenuItem("Remove Account");
 
-		operatorTools.getItems().addAll(depositTool, withdrawTool, infoTool, removeTool);
-
-		
-		outputArea.setPrefRowCount(4);
-		outputArea.setPrefColumnCount(8);
-		outputArea.setEditable(false);
-		mainPane.setCenter(outputArea);
+		operatorTools.getItems().addAll(depositWithdrawTool, infoTool, removeTool, endOfMonthTool);
 
 		// Handling Events:
+
 		exitMenuItem.setOnAction(actionEvent -> {
 			Platform.exit();
 		});
 
 		createChecking.setOnAction(actionEvent -> {
-			setScene();
+			setScene(getAccountPane());
 			accountSwitch = 1;
 		});
 
 		createGold.setOnAction(actionEvent -> {
-			setScene();
+			setScene(getAccountPane());
 			accountSwitch = 2;
 		});
 
 		createRegular.setOnAction(actionEvent -> {
-			setScene();
+			setScene(getAccountPane());
 			accountSwitch = 3;
+		});
+		infoTool.setOnAction(actionEvent -> {
+			start(stage);
+			displayStatistics();
+		});
+		endOfMonthTool.setOnAction(actionEvent -> {
+			start(stage);
+			endOfMonth();
+		});
+		endOfMonthTool.setOnAction(actionEvent -> {
+			start(stage);
+			endOfMonth();
+		});
+		depositWithdrawTool.setOnAction(actionEvent -> {
+			setScene(getDepositWithdrawPane());
 		});
 
 		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
@@ -121,42 +143,8 @@ public class MainGui extends Application {
 	}
 
 	protected BorderPane getAccountPane() {
-		BorderPane mainPane = new BorderPane();
-		MenuBar menuBar = new MenuBar();
-		menuBar.setPrefWidth(300);
-		mainPane.setTop(menuBar);
-
-		// File menu - new, save, exit
-		Menu fileMenu = new Menu("File");
-		MenuItem newMenuItem = new MenuItem("New");
-		MenuItem saveMenuItem = new MenuItem("Save");
-		MenuItem exitMenuItem = new MenuItem("Exit");
-		exitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN));
-
-		fileMenu.getItems().addAll(newMenuItem, saveMenuItem, new SeparatorMenuItem(), exitMenuItem);
-
-		// CheckMenuItem: A MenuItem that can be toggled between selected and unselected
-		// states.
-		Menu operatorMenu = new Menu("Create Accounts");
-		MenuItem createChecking = new MenuItem("Checking");
-		MenuItem createGold = new MenuItem("Gold");
-		MenuItem createRegular = new MenuItem("Regular");
-
-		operatorMenu.getItems().addAll(createChecking, createGold, createRegular);
-
-		Menu operatorTools = new Menu("Tools");
-		MenuItem depositTool = new MenuItem("Deposit");
-		MenuItem withdrawTool = new MenuItem("Withdraw");
-		MenuItem infoTool = new MenuItem("Information");
-		MenuItem removeTool = new MenuItem("Remove Account");
-
-		operatorTools.getItems().addAll(depositTool, withdrawTool, infoTool, removeTool);
-		// Handling Events:
-		exitMenuItem.setOnAction(actionEvent -> {
-			Platform.exit();
-		});
-
 		GridPane accountLayout = new GridPane();
+		BorderPane mainPane = getDefaultPane();
 		mainPane.setCenter(accountLayout);
 		accountLayout.setVgap(5.5);
 		accountLayout.setHgap(5.5);
@@ -180,21 +168,14 @@ public class MainGui extends Application {
 		Button createAccountBtn = new Button("Create Account");
 		accountLayout.add(createAccountBtn, 2, 5);
 
-
-		createChecking.setOnAction(actionEvent -> {
-			setScene();
-			accountSwitch = 1;
-		});
-
 		createAccountBtn.setOnAction(actionEvent -> {
 			if (accountSwitch == 1) {
-				
-			
-			createCheckingAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
-					accountNumber.getText());
 
-			start(stage);
-			outputArea.setText(outputAreaText += "Checking Account was created \n");
+				createCheckingAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
+						accountNumber.getText());
+
+				start(stage);
+				outputArea.setText(outputAreaText += "Checking Account was created \n");
 			}
 			if (accountSwitch == 2) {
 
@@ -212,18 +193,35 @@ public class MainGui extends Application {
 				start(stage);
 				outputArea.setText(outputAreaText += "Regular Account was created \n");
 			}
-			
-			
-		});
 
-		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
+		});
 
 		return mainPane;
 
 	}
-	
-	
-	
+
+	protected BorderPane getDepositWithdrawPane() {
+		GridPane accountLayout = new GridPane();
+		BorderPane mainPane = getDefaultPane();
+		mainPane.setCenter(accountLayout);
+		accountLayout.setVgap(5.5);
+		accountLayout.setHgap(5.5);
+
+		TextField accountIDText = new TextField();
+		accountLayout.add(new Label("Enter Account ID "), 1, 1);
+		accountLayout.add(accountIDText, 2, 1);
+
+		TextField depositText = new TextField();
+		accountLayout.add(new Label("Deposit "), 1, 2);
+		accountLayout.add(depositText, 2, 2);
+
+		TextField withdrawText = new TextField();
+		accountLayout.add(new Label("Withdraw "), 1, 3);
+		accountLayout.add(withdrawText, 2, 3);
+
+		return mainPane;
+	}
+
 	// A method that creates a new checking a customer through user inputs
 	public static void createCheckingAccount(String name, String accId, String accNumber) {
 		Customer cust1 = new Customer(null, null);
@@ -356,7 +354,7 @@ public class MainGui extends Application {
 	}
 
 	// Method to apply end of month updates to user accounts
-	public static void endOfMonth() {
+	public void endOfMonth() {
 		for (Account e : accounts) {
 			if (e instanceof CheckingAccount) {
 				CheckingAccount ce = (CheckingAccount) e;
@@ -375,12 +373,13 @@ public class MainGui extends Application {
 
 			}
 		}
+		outputArea.setText(outputAreaText += ("End of month updates have been applied." + "\n"));
 	}
 
 	// Method to display Statistics of bank, total sum of all accounts in the
 	// bank, number of zero-balance accounts, average balance of accounts, the
 	// account with largest balance
-	public static void displayStatistics() {
+	public void displayStatistics() {
 		double sumOfAccounts = 0;
 		int numOfZeroBalance = 0;
 		double averageBalance = 0;
@@ -399,10 +398,12 @@ public class MainGui extends Application {
 
 		}
 		averageBalance = sumOfAccounts / counter;
-		System.out.println("The sum of all accounts is $" + sumOfAccounts);
-		System.out.println("The number of zero balance accounts is " + numOfZeroBalance);
-		System.out.println("The average balance of all accounts is $" + averageBalance);
-		System.out.println("The largest account is " + largestAccount);
+		outputArea.setText(outputAreaText += ("=======================" + "\n"));
+		outputArea.setText(outputAreaText += ("The sum of all accounts is $" + sumOfAccounts + "\n"));
+		outputArea.setText(outputAreaText += ("The number of zero balance accounts is " + numOfZeroBalance + "\n"));
+		outputArea.setText(outputAreaText += ("The average balance of all accounts is $" + averageBalance + "\n"));
+		outputArea.setText(outputAreaText += ("The largest account is " + largestAccount + "\n"));
+		outputArea.setText(outputAreaText += ("=======================" + "\n"));
 
 	}
 
