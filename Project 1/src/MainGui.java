@@ -219,6 +219,16 @@ public class MainGui extends Application {
 		accountLayout.add(new Label("Withdraw "), 1, 3);
 		accountLayout.add(withdrawText, 2, 3);
 
+		Button depositWithdrawBtn = new Button("Submit");
+		accountLayout.add(depositWithdrawBtn, 2, 4);
+
+		depositWithdrawBtn.setOnAction(actionEvent -> {
+
+			deposit(accountIDText.getText(), Double.parseDouble(depositText.getText()));
+			withdraw(accountIDText.getText(), Double.parseDouble(withdrawText.getText()));
+			start(stage);
+		});
+
 		return mainPane;
 	}
 
@@ -301,11 +311,7 @@ public class MainGui extends Application {
 		}
 	}
 
-	public static void deposit() {
-		System.out.println("Please input account number ");
-		String accountNumber = input.next();
-		System.out.println("Please input the amount you'd like to deposit: ");
-		double depositNum = input.nextDouble();
+	public static void deposit(String accountNumber, double depositNum) {
 
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
@@ -327,11 +333,7 @@ public class MainGui extends Application {
 		}
 	}
 
-	public static void withdraw() {
-		System.out.println("Please input account number: ");
-		String accountNumber = input.next();
-		System.out.println("Please input the amount you'd like to withdraw: ");
-		double withdrawNum = input.nextDouble();
+	public static void withdraw(String accountNumber, double withdrawNum) {
 
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
