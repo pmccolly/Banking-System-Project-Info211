@@ -108,18 +108,18 @@ public class MainGui extends Application {
 		});
 
 		createChecking.setOnAction(actionEvent -> {
-			setScene(getAccountPane());
 			accountSwitch = 1;
+			setScene(getAccountPane());
 		});
 
 		createGold.setOnAction(actionEvent -> {
-			setScene(getAccountPane());
 			accountSwitch = 2;
+			setScene(getAccountPane());
 		});
 
 		createRegular.setOnAction(actionEvent -> {
-			setScene(getAccountPane());
 			accountSwitch = 3;
+			setScene(getAccountPane());
 		});
 		infoTool.setOnAction(actionEvent -> {
 			start(stage);
@@ -136,6 +136,9 @@ public class MainGui extends Application {
 		depositWithdrawTool.setOnAction(actionEvent -> {
 			setScene(getDepositWithdrawPane());
 		});
+		removeTool.setOnAction(actionEvent -> {
+			setScene(getRemoveAccountsPane());
+		});
 
 		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
 
@@ -148,25 +151,38 @@ public class MainGui extends Application {
 		mainPane.setCenter(accountLayout);
 		accountLayout.setVgap(5.5);
 		accountLayout.setHgap(5.5);
+		
+		if (accountSwitch == 1) {
+			accountLayout.add(new Label("Checking Account "), 2, 1);;
+			
+		}
+		if (accountSwitch == 2) {
+			accountLayout.add(new Label("Gold Account"), 2, 1);
+			
+		}
+		if (accountSwitch == 3) {
+			
+			accountLayout.add(new Label("Regular Account"), 2, 1);
+		}
 
 		TextField firstName = new TextField();
-		accountLayout.add(new Label("First Name "), 1, 1);
-		accountLayout.add(firstName, 2, 1);
+		accountLayout.add(new Label("First Name "), 1, 2);
+		accountLayout.add(firstName, 2, 2);
 
 		TextField lastName = new TextField();
-		accountLayout.add(new Label("Last Name "), 1, 2);
-		accountLayout.add(lastName, 2, 2);
+		accountLayout.add(new Label("Last Name "), 1, 3);
+		accountLayout.add(lastName, 2, 3);
 
 		TextField accountId = new TextField();
-		accountLayout.add(new Label("Account ID"), 1, 3);
-		accountLayout.add(accountId, 2, 3);
+		accountLayout.add(new Label("Account ID"), 1, 4);
+		accountLayout.add(accountId, 2, 4);
 
 		TextField accountNumber = new TextField();
-		accountLayout.add(new Label("Account Number"), 1, 4);
-		accountLayout.add(accountNumber, 2, 4);
+		accountLayout.add(new Label("Account Number"), 1, 5);
+		accountLayout.add(accountNumber, 2, 5);
 
 		Button createAccountBtn = new Button("Create Account");
-		accountLayout.add(createAccountBtn, 2, 5);
+		accountLayout.add(createAccountBtn, 2, 6);
 
 		createAccountBtn.setOnAction(actionEvent -> {
 			if (accountSwitch == 1) {
@@ -232,6 +248,30 @@ public class MainGui extends Application {
 		return mainPane;
 	}
 
+	protected BorderPane getRemoveAccountsPane() {
+		GridPane accountLayout = new GridPane();
+		BorderPane mainPane = getDefaultPane();
+		mainPane.setCenter(accountLayout);
+		accountLayout.setVgap(5.5);
+		accountLayout.setHgap(5.5);
+
+		TextField accountIDText = new TextField();
+		accountLayout.add(new Label("Enter Account ID "), 1, 1);
+		accountLayout.add(accountIDText, 2, 1);
+
+		Button depositWithdrawBtn = new Button("Submit");
+		accountLayout.add(depositWithdrawBtn, 2, 4);
+
+		depositWithdrawBtn.setOnAction(actionEvent -> {
+
+			removeAccount(accountIDText.getText());
+
+			start(stage);
+		});
+
+		return mainPane;
+	}
+
 	// A method that creates a new checking a customer through user inputs
 	public static void createCheckingAccount(String name, String accId, String accNumber) {
 		Customer cust1 = new Customer(null, null);
@@ -289,10 +329,7 @@ public class MainGui extends Application {
 	}
 
 	// Removes an account from the array list
-	public static void removeAccount() {
-
-		System.out.println("Please input the account number: ");
-		String accountNumber = input.next();
+	public static void removeAccount(String accountNumber) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accountNumber.equals(accounts.get(i).getNumber())) {
 				accounts.remove(i);
@@ -311,7 +348,7 @@ public class MainGui extends Application {
 		}
 	}
 
-	public static void deposit(String accountNumber, double depositNum) {
+	public void deposit(String accountNumber, double depositNum) {
 
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
@@ -331,9 +368,11 @@ public class MainGui extends Application {
 				}
 			}
 		}
+		outputArea.setText(outputAreaText += ("$" + depositNum + " has been withdrawn from account number "
+				+ accountNumber + "\n"));
 	}
 
-	public static void withdraw(String accountNumber, double withdrawNum) {
+	public void withdraw(String accountNumber, double withdrawNum) {
 
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
@@ -353,6 +392,8 @@ public class MainGui extends Application {
 				}
 			}
 		}
+		outputArea.setText(outputAreaText += ("$" + withdrawNum + " has been withdrawn from account number "
+				+ accountNumber + "\n"));
 	}
 
 	// Method to apply end of month updates to user accounts
