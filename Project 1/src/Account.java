@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public abstract class Account {
+public abstract class Account implements Serializable {
 
 	// account number, balance, and customer information
 	protected String number;

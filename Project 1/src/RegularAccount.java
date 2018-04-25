@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class RegularAccount extends Account {
+public class RegularAccount extends Account implements Serializable {
 
 	public RegularAccount(String number, double balance, Customer customerInfo) {
 		super(number, balance, customerInfo);

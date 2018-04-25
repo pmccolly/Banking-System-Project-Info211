@@ -1,23 +1,35 @@
 
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.File;
 
-import javax.swing.JOptionPane;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -27,22 +39,34 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class MainGui extends Application {
+// Title: Project Part 2: Bank GUI
+// Semester: Info 211 Spring 2018
+// Authors: Phil McColly, Gavin LaDue
+public class MainGui extends Application implements Serializable {
 
-	static Scanner input = new Scanner(System.in);
-	static ArrayList<Account> accounts = new ArrayList<Account>();
-	private Stage stage;
+	List<Account> accounts = new ArrayList<Account>();
+	Stage stage;
 	TextArea outputArea = new TextArea();
+	
+	// String to add all necessary text to (similar to a log)
 	String outputAreaText = "";
+	
 	int accountSwitch = 0;
 
 	public static void main(String[] args) {
+
 		launch(args);
 	}
 
 	// ===========================================
 	@Override
 	public void start(Stage primaryStage) {
+		try {
+			openFile();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		Scene scene = new Scene(getMainTextArea(), 400, 300, Color.WHITE);
 		primaryStage.setTitle("Bank of McColly and LaDue");
@@ -50,16 +74,17 @@ public class MainGui extends Application {
 		primaryStage.show();
 		primaryStage.getIcons().add(new Image("file:src/icon.jpg"));
 		this.stage = primaryStage;
-	}
 
-	public void setScene(BorderPane pane) {
+	}
+	// Method to change scenes using panes
+	public void setScenes(BorderPane pane) {
 		Scene scene = new Scene(pane, 400, 300, Color.WHITE);
 
 		stage.setScene(scene);
 		stage.show();
 	}
-
-	protected BorderPane getMainTextArea() {
+	// Adds a TextArea to the default pane
+	public BorderPane getMainTextArea() {
 		outputArea.setPrefRowCount(4);
 		outputArea.setPrefColumnCount(8);
 		outputArea.setEditable(false);
@@ -68,8 +93,8 @@ public class MainGui extends Application {
 		mainPane.setCenter(outputArea);
 		return mainPane;
 	}
-
-	protected BorderPane getDefaultPane() {
+	// Creates a template to base all other panes off of
+	public BorderPane getDefaultPane() {
 		BorderPane mainPane = new BorderPane();
 		MenuBar menuBar = new MenuBar();
 		menuBar.setPrefWidth(300);
@@ -77,12 +102,12 @@ public class MainGui extends Application {
 
 		// File menu - new, save, exit
 		Menu fileMenu = new Menu("File");
-		MenuItem newMenuItem = new MenuItem("New");
+
 		MenuItem saveMenuItem = new MenuItem("Save");
 		MenuItem exitMenuItem = new MenuItem("Exit");
 		exitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN));
 
-		fileMenu.getItems().addAll(newMenuItem, saveMenuItem, new SeparatorMenuItem(), exitMenuItem);
+		fileMenu.getItems().addAll(saveMenuItem, new SeparatorMenuItem(), exitMenuItem);
 
 		// CheckMenuItem: A MenuItem that can be toggled between selected and unselected
 		// states.
@@ -93,13 +118,19 @@ public class MainGui extends Application {
 
 		operatorMenu.getItems().addAll(createChecking, createGold, createRegular);
 
-		Menu operatorTools = new Menu("Tools");
-		MenuItem depositWithdrawTool = new MenuItem("Deposit/Withdraw");
-		MenuItem infoTool = new MenuItem("Information");
+		Menu operatorInfo = new Menu("Information");
+		MenuItem statsTool = new MenuItem("Bank Statistics");
 		MenuItem endOfMonthTool = new MenuItem("Apply End of Month");
-		MenuItem removeTool = new MenuItem("Remove Account");
+		MenuItem infoTool = new MenuItem("Account Information");
 
-		operatorTools.getItems().addAll(depositWithdrawTool, infoTool, removeTool, endOfMonthTool);
+		operatorInfo.getItems().addAll(infoTool, statsTool, endOfMonthTool);
+
+		Menu operatorTools = new Menu("Tools");
+		MenuItem removeTool = new MenuItem("Remove Account");
+		MenuItem depositTool = new MenuItem("Deposit");
+		MenuItem withdrawTool = new MenuItem("Withdraw");
+
+		operatorTools.getItems().addAll(depositTool, withdrawTool, removeTool);
 
 		// Handling Events:
 
@@ -109,59 +140,70 @@ public class MainGui extends Application {
 
 		createChecking.setOnAction(actionEvent -> {
 			accountSwitch = 1;
-			setScene(getAccountPane());
+			setScenes(getAccountPane());
 		});
 
 		createGold.setOnAction(actionEvent -> {
 			accountSwitch = 2;
-			setScene(getAccountPane());
+			setScenes(getAccountPane());
 		});
 
 		createRegular.setOnAction(actionEvent -> {
 			accountSwitch = 3;
-			setScene(getAccountPane());
+			setScenes(getAccountPane());
 		});
-		infoTool.setOnAction(actionEvent -> {
-			start(stage);
+		statsTool.setOnAction(actionEvent -> {
+			setScenes(getMainTextArea());
 			displayStatistics();
 		});
 		endOfMonthTool.setOnAction(actionEvent -> {
-			start(stage);
+			setScenes(getMainTextArea());
 			endOfMonth();
 		});
 		endOfMonthTool.setOnAction(actionEvent -> {
-			start(stage);
+			setScenes(getMainTextArea());
 			endOfMonth();
 		});
-		depositWithdrawTool.setOnAction(actionEvent -> {
-			setScene(getDepositWithdrawPane());
+		depositTool.setOnAction(actionEvent -> {
+			setScenes(getDepositPane());
+		});
+		withdrawTool.setOnAction(actionEvent -> {
+			setScenes(getWithdrawPane());
 		});
 		removeTool.setOnAction(actionEvent -> {
-			setScene(getRemoveAccountsPane());
+			setScenes(getRemoveAccountsPane());
+		});
+		infoTool.setOnAction(actionEvent -> {
+			setScenes(getAccountInfoPane());
+		});
+		saveMenuItem.setOnAction(actionEvent -> {
+			save();
 		});
 
-		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools);
+		menuBar.getMenus().addAll(fileMenu, operatorMenu, operatorTools, operatorInfo);
 
 		return mainPane;
 	}
 
-	protected BorderPane getAccountPane() {
+	// Method to create the create accounts pane
+	public BorderPane getAccountPane() {
 		GridPane accountLayout = new GridPane();
 		BorderPane mainPane = getDefaultPane();
 		mainPane.setCenter(accountLayout);
 		accountLayout.setVgap(5.5);
 		accountLayout.setHgap(5.5);
-		
+
 		if (accountSwitch == 1) {
-			accountLayout.add(new Label("Checking Account "), 2, 1);;
-			
+			accountLayout.add(new Label("Checking Account "), 2, 1);
+			;
+
 		}
 		if (accountSwitch == 2) {
 			accountLayout.add(new Label("Gold Account"), 2, 1);
-			
+
 		}
 		if (accountSwitch == 3) {
-			
+
 			accountLayout.add(new Label("Regular Account"), 2, 1);
 		}
 
@@ -174,23 +216,28 @@ public class MainGui extends Application {
 		accountLayout.add(lastName, 2, 3);
 
 		TextField accountId = new TextField();
+		numericTextField(accountId);
 		accountLayout.add(new Label("Account ID"), 1, 4);
 		accountLayout.add(accountId, 2, 4);
 
 		TextField accountNumber = new TextField();
+		numericTextField(accountNumber);
 		accountLayout.add(new Label("Account Number"), 1, 5);
 		accountLayout.add(accountNumber, 2, 5);
 
 		Button createAccountBtn = new Button("Create Account");
 		accountLayout.add(createAccountBtn, 2, 6);
 
+		// This determines which kind of account was created by assigning each kind of
+		// account to a value and then using
+		// if statements
 		createAccountBtn.setOnAction(actionEvent -> {
 			if (accountSwitch == 1) {
 
 				createCheckingAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
 						accountNumber.getText());
 
-				start(stage);
+				setScenes(getMainTextArea());
 				outputArea.setText(outputAreaText += "Checking Account was created \n");
 			}
 			if (accountSwitch == 2) {
@@ -198,7 +245,7 @@ public class MainGui extends Application {
 				createGoldAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
 						accountNumber.getText());
 
-				start(stage);
+				setScenes(getMainTextArea());
 				outputArea.setText(outputAreaText += "Gold Account was created \n");
 			}
 			if (accountSwitch == 3) {
@@ -206,7 +253,7 @@ public class MainGui extends Application {
 				createRegularAccount(firstName.getText() + " " + lastName.getText(), accountId.getText(),
 						accountNumber.getText());
 
-				start(stage);
+				setScenes(getMainTextArea());
 				outputArea.setText(outputAreaText += "Regular Account was created \n");
 			}
 
@@ -216,7 +263,8 @@ public class MainGui extends Application {
 
 	}
 
-	protected BorderPane getDepositWithdrawPane() {
+	// toolbar deposit function
+	public BorderPane getDepositPane() {
 		GridPane accountLayout = new GridPane();
 		BorderPane mainPane = getDefaultPane();
 		mainPane.setCenter(accountLayout);
@@ -224,31 +272,32 @@ public class MainGui extends Application {
 		accountLayout.setHgap(5.5);
 
 		TextField accountIDText = new TextField();
-		accountLayout.add(new Label("Enter Account ID "), 1, 1);
+		numericTextField(accountIDText);
+		accountLayout.add(new Label("Enter Account Number "), 1, 1);
 		accountLayout.add(accountIDText, 2, 1);
 
 		TextField depositText = new TextField();
+		numericTextField(depositText);
 		accountLayout.add(new Label("Deposit "), 1, 2);
 		accountLayout.add(depositText, 2, 2);
 
-		TextField withdrawText = new TextField();
-		accountLayout.add(new Label("Withdraw "), 1, 3);
-		accountLayout.add(withdrawText, 2, 3);
+		Button depositBtn = new Button("Submit");
+		accountLayout.add(depositBtn, 2, 4);
 
-		Button depositWithdrawBtn = new Button("Submit");
-		accountLayout.add(depositWithdrawBtn, 2, 4);
+		depositBtn.setOnAction(actionEvent -> {
+			if (depositText.getText().length() > 0) {
+				deposit(accountIDText.getText(), Double.parseDouble(depositText.getText()));
 
-		depositWithdrawBtn.setOnAction(actionEvent -> {
+			}
 
-			deposit(accountIDText.getText(), Double.parseDouble(depositText.getText()));
-			withdraw(accountIDText.getText(), Double.parseDouble(withdrawText.getText()));
-			start(stage);
+			setScenes(getMainTextArea());
 		});
 
 		return mainPane;
 	}
 
-	protected BorderPane getRemoveAccountsPane() {
+	// Toolbar withdraw option
+	public BorderPane getWithdrawPane() {
 		GridPane accountLayout = new GridPane();
 		BorderPane mainPane = getDefaultPane();
 		mainPane.setCenter(accountLayout);
@@ -256,7 +305,65 @@ public class MainGui extends Application {
 		accountLayout.setHgap(5.5);
 
 		TextField accountIDText = new TextField();
-		accountLayout.add(new Label("Enter Account ID "), 1, 1);
+		numericTextField(accountIDText);
+		accountLayout.add(new Label("Enter Account Number "), 1, 1);
+		accountLayout.add(accountIDText, 2, 1);
+
+		TextField withDrawText = new TextField();
+		numericTextField(withDrawText);
+		accountLayout.add(new Label("Deposit "), 1, 2);
+		accountLayout.add(withDrawText, 2, 2);
+
+		Button withdrawBtn = new Button("Submit");
+		accountLayout.add(withdrawBtn, 2, 4);
+
+		withdrawBtn.setOnAction(actionEvent -> {
+
+			if (withDrawText.getText().length() > 0) {
+				withdraw(accountIDText.getText(), Double.parseDouble(withDrawText.getText()));
+
+			}
+
+			setScenes(getMainTextArea());
+		});
+
+		return mainPane;
+	}
+
+	// Creates the account info scene
+	public BorderPane getAccountInfoPane() {
+		GridPane accountLayout = new GridPane();
+		BorderPane mainPane = getDefaultPane();
+		mainPane.setCenter(accountLayout);
+		accountLayout.setVgap(5.5);
+		accountLayout.setHgap(5.5);
+
+		TextField accountIDText = new TextField();
+		accountLayout.add(new Label("Enter Account Number "), 1, 1);
+		accountLayout.add(accountIDText, 2, 1);
+
+		Button submitBtn = new Button("Submit");
+		accountLayout.add(submitBtn, 2, 4);
+
+		submitBtn.setOnAction(actionEvent -> {
+			accountInfo(accountIDText.getText());
+			setScenes(getMainTextArea());
+		});
+
+		return mainPane;
+	}
+
+	// Creates the remove account scene
+	public BorderPane getRemoveAccountsPane() {
+		GridPane accountLayout = new GridPane();
+		BorderPane mainPane = getDefaultPane();
+		mainPane.setCenter(accountLayout);
+		accountLayout.setVgap(5.5);
+		accountLayout.setHgap(5.5);
+
+		TextField accountIDText = new TextField();
+		numericTextField(accountIDText);
+		accountLayout.add(new Label("Enter Account Number "), 1, 1);
 		accountLayout.add(accountIDText, 2, 1);
 
 		Button depositWithdrawBtn = new Button("Submit");
@@ -266,23 +373,23 @@ public class MainGui extends Application {
 
 			removeAccount(accountIDText.getText());
 
-			start(stage);
+			setScenes(getMainTextArea());
 		});
 
 		return mainPane;
 	}
 
 	// A method that creates a new checking a customer through user inputs
-	public static void createCheckingAccount(String name, String accId, String accNumber) {
-		Customer cust1 = new Customer(null, null);
+	public void createCheckingAccount(String name, String accId, String accNumber) {
+		Customer customer = new Customer(null, null);
 
 		String customerInfo = name;
-		cust1.setCustomerName(customerInfo);
+		customer.setCustomerName(customerInfo);
 
 		String customerID = accId;
-		cust1.setCustomerID(customerID);
+		customer.setCustomerID(customerID);
 		// Creates a new account
-		Account ac1 = new CheckingAccount(null, 0, cust1);
+		Account ac1 = new CheckingAccount(null, 0, customer);
 
 		String number = accNumber;
 		ac1.setNumber(number);
@@ -290,16 +397,16 @@ public class MainGui extends Application {
 	}
 
 	// A method that creates a Gold Account through user inputs
-	public static void createGoldAccount(String name, String accId, String accNumber) {
-		Customer cust1 = new Customer(null, null);
+	public void createGoldAccount(String name, String accId, String accNumber) {
+		Customer customer = new Customer(null, null);
 
 		String customerInfo = name;
-		cust1.setCustomerName(customerInfo);
+		customer.setCustomerName(customerInfo);
 
 		String customerID = accId;
-		cust1.setCustomerID(customerID);
+		customer.setCustomerID(customerID);
 		// Creates a new account
-		Account ac1 = new CheckingAccount(null, 0, cust1);
+		Account ac1 = new CheckingAccount(null, 0, customer);
 
 		String number = accNumber;
 		ac1.setNumber(number);
@@ -307,16 +414,16 @@ public class MainGui extends Application {
 	}
 
 	// Creates a Regular Account through user inputs
-	public static void createRegularAccount(String name, String accId, String accNumber) {
-		Customer cust1 = new Customer(null, null);
+	public void createRegularAccount(String name, String accId, String accNumber) {
+		Customer customer = new Customer(null, null);
 
 		String customerInfo = name;
-		cust1.setCustomerName(customerInfo);
+		customer.setCustomerName(customerInfo);
 
 		String customerID = accId;
-		cust1.setCustomerID(customerID);
+		customer.setCustomerID(customerID);
 		// Creates a new account
-		Account ac1 = new CheckingAccount(null, 0, cust1);
+		Account ac1 = new CheckingAccount(null, 0, customer);
 
 		String number = accNumber;
 		ac1.setNumber(number);
@@ -324,12 +431,12 @@ public class MainGui extends Application {
 	}
 
 	// Adds an account to the accounts array list
-	public static void addAccount(Account Account) {
+	public void addAccount(Account Account) {
 		accounts.add(Account);
 	}
 
 	// Removes an account from the array list
-	public static void removeAccount(String accountNumber) {
+	public void removeAccount(String accountNumber) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accountNumber.equals(accounts.get(i).getNumber())) {
 				accounts.remove(i);
@@ -338,16 +445,17 @@ public class MainGui extends Application {
 	}
 
 	// Displays the accounts user information
-	public static void accountInfo() {
-		System.out.println("Please input account number: ");
-		String accountNumber = input.next();
+	public void accountInfo(String accountNumber) {
+
 		for (Account e : accounts) {
 			if (accountNumber.equals(e.getNumber())) {
-				System.out.print(e);
+				outputArea.setText(e.toString() + "\n");
 			}
 		}
+
 	}
 
+	// Method used to add to the total balance
 	public void deposit(String accountNumber, double depositNum) {
 
 		for (Account e : accounts) {
@@ -368,10 +476,11 @@ public class MainGui extends Application {
 				}
 			}
 		}
-		outputArea.setText(outputAreaText += ("$" + depositNum + " has been withdrawn from account number "
+		outputArea.setText(outputAreaText += ("$" + depositNum + " has been deposited from account number "
 				+ accountNumber + "\n"));
 	}
 
+	// Method used to deduct from the total balance
 	public void withdraw(String accountNumber, double withdrawNum) {
 
 		for (Account e : accounts) {
@@ -448,6 +557,65 @@ public class MainGui extends Application {
 		outputArea.setText(outputAreaText += ("The largest account is " + largestAccount + "\n"));
 		outputArea.setText(outputAreaText += ("=======================" + "\n"));
 
+	}
+
+	// Method to open file with accounts Array Object
+	public void openFile() throws ClassNotFoundException {
+		// Pulls information from the file upon opening the program
+		File f = new File("accountsdata.ser");
+		if (f.exists()) {
+
+			try {
+				ObjectInputStream input = new ObjectInputStream(new FileInputStream(f));
+
+				accounts = (ArrayList<Account>) input.readObject();
+				System.out.println("opens");
+
+			} catch (IOException ioException) {
+				System.err.println("Error opening file.");
+				// ioException.printStackTrace();
+				System.out.println();
+			}
+		}
+	}
+
+	// Saves the program
+	public void save() {
+
+		File f = new File("accountsdata.ser");
+		try {
+			ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(f));
+			output.writeObject(accounts);
+			System.out.println("Saved");
+		} catch (IOException ioException) {
+			System.err.println("Error opening file.");
+			// ioException.printStackTrace();
+			System.out.println();
+		}
+
+	}
+
+	// Method to make textfields only enter double format
+	// Reference: https://stackoverflow.com/questions/31039449/java-8-u40-textformatter-javafx-to-restrict-user-input-only-for-decimal-number
+	// Author: Uluk Biy
+	public TextField numericTextField(TextField field) {
+		DecimalFormat format = new DecimalFormat("#.0");
+
+		field.setTextFormatter(new TextFormatter<>(c -> {
+			if (c.getControlNewText().isEmpty()) {
+				return c;
+			}
+
+			ParsePosition parsePosition = new ParsePosition(0);
+			Object object = format.parse(c.getControlNewText(), parsePosition);
+
+			if (object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
+				return null;
+			} else {
+				return c;
+			}
+		}));
+		return field;
 	}
 
 }

@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class GoldAccount extends Account {
+public class GoldAccount extends Account implements Serializable {
 
 	public GoldAccount(String number, double balance, Customer customerInfo) {
 		super(number, balance, customerInfo);

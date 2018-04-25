@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class CheckingAccount extends Account {
+public class CheckingAccount extends Account implements Serializable {
 	int chargeNumber = 0;
 
 	public CheckingAccount(String number, double balance, Customer customerInfo) {
